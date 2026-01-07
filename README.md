@@ -71,6 +71,11 @@ YingShiPan（影视盘）是一款跨平台的网盘资源管理应用，支持�
 3. 提交修改：`git commit -m "feat: 新增xxx功能"`
 4. 推送分支：`git push origin feature/xxx`
 5. 提交 Pull Request，注明修改内容和测试结果
+## 贡献者
+
+感谢以下用户的贡献
+
+[![Contributors](https://contrib.rocks/image?repo=mcxiedidi/yingshipan)](https://github.com/mcxiedidi/yingshipan/graphs/contributors)
 
 ## ⚠️ 免责声明
 1. 本项目仅用于个人学习和非商业用途，禁止用于侵权、违法资源的传播与管理
@@ -87,13 +92,5 @@ YingShiPan（影视盘）是一款跨平台的网盘资源管理应用，支持�
   <br/>
   © 2026 YingShiPan Team | 基于 CC BY-NC-SA 4.0 协议开源
 </div>
-
----
-
-## Contributors
-
-感谢以下用户的贡献
-
-[![Contributors](https://contrib.rocks/image?repo=mcxiedidi/yingshipan)](https://github.com/mcxiedidi/yingshipan/graphs/contributors)
 
 ---
