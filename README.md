@@ -2,7 +2,7 @@
 <div align="center">
   <img src="https://img.shields.io/badge/YingShiPan-影视盘-ff69b4.svg?style=for-the-badge" alt="YingShiPan Logo"/>
   <br/>
-  <img src="https://img.shields.io/github/license/your-username/YingShiPan?style=flat-square&color=blue" alt="License"/>
+  <img src="https://img.shields.io/github/license/mcxiedidi/YingShiPan?style=flat-square&color=blue" alt="License"/>
   <img src="https://img.shields.io/badge/language-Flutter%20%7C%20Java-9cf?style=flat-square" alt="Language"/>
   <img src="https://img.shields.io/badge/TMDB-API%20Integration-green?style=flat-square" alt="TMDB Integration"/>
   <img src="https://img.shields.io/badge/support-cloud%20drives-8A2BE2?style=flat-square" alt="Cloud Drive Support"/>
