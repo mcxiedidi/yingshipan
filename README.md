@@ -89,3 +89,11 @@ YingShiPan（影视盘）是一款跨平台的网盘资源管理应用，支持�
 </div>
 
 ---
+
+## Contributors
+
+感谢以下用户的贡献
+
+[![Contributors](https://contrib.rocks/image?repo=mcxiedidi/yingshipan)](https://github.com/mcxiedidi/yingshipan/graphs/contributors)
+
+---
