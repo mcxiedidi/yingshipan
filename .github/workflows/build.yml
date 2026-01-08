@@ -5,6 +5,10 @@ on:
     tags:
       - '*'  # 匹配所有 tag，例如 v1.0.0
 
+# 全局权限配置：授予修改 Release/仓库内容的权限
+permissions:
+  contents: write
+
 # 定义多个“任务”（jobs），每个任务表示构建一个平台的应用
 jobs:
   android: # 构建 Android 应用
@@ -28,6 +32,9 @@ jobs:
           name: Release ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.sha }}
           draft: ${{ startsWith(github.ref, 'refs/tags/') == false }}
           prerelease: false
+        env:
+          # 显式指定 GITHUB_TOKEN（虽然默认会注入，但显式声明更稳妥）
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   ios: # 构建 iOS 应用（需要 macOS 系统）
     runs-on: macos-latest
@@ -46,3 +53,6 @@ jobs:
           name: Release ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.sha }}
           draft: ${{ startsWith(github.ref, 'refs/tags/') == false }}
           prerelease: false
+        env:
+          # 显式指定 GITHUB_TOKEN
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
