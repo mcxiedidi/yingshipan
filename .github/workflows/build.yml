@@ -5,9 +5,12 @@ on:
     tags:
       - '*'  # 匹配所有 tag，例如 v1.0.0
 
+      
 jobs:
   android: # 构建 Android 应用
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,6 +38,8 @@ jobs:
 
   ios: # 构建 iOS 应用
     runs-on: macos-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
