@@ -55,7 +55,7 @@ jobs:
       
       - uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.APP_NAME }}_${{ env.VERSION }}.apk
+          files: ${{ env.APK_NAME || env.APP_NAME }}_${{ env.VERSION }}.apk
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.sha }}
           name: ${{ env.APP_NAME }} Release ${{ env.VERSION }}
           draft: ${{ startsWith(github.ref, 'refs/tags/') == false }}
@@ -93,43 +93,36 @@ jobs:
       
       - run: flutter pub get
       
-      # 方法1：构建未签名的 .ipa（仅用于测试）
+      # 构建 iOS 应用（未签名的 .app）
       - name: 构建 iOS 应用
         run: |
-          # 先构建 .app
           flutter build ios --release --no-codesign
-          
-          # 创建 Payload 目录
-          mkdir -p Payload
-          
-          # 将 .app 复制到 Payload 目录
-          cp -r build/ios/iphoneos/Runner.app Payload/
-          
-          # 压缩为 .ipa 文件
+      
+      # 创建 .ipa 文件（未签名，用于测试）
+      - name: 创建 IPA 文件
+        run: |
           IPA_NAME="${APP_NAME}_${{ env.VERSION }}.ipa"
           echo "IPA_NAME=${IPA_NAME}" >> $GITHUB_ENV
-          zip -r ${IPA_NAME} Payload
+          
+          # 创建临时目录结构
+          mkdir -p Payload
+          
+          # 复制 .app 到 Payload
+          cp -r build/ios/iphoneos/Runner.app Payload/
+          
+          # 创建 IPA（zip 格式）
+          zip -r "${IPA_NAME}" Payload
+          
+          # 验证文件
+          ls -la "${IPA_NAME}"
           
           # 清理
           rm -rf Payload
       
-      # 方法2：如果您有签名证书，可以使用以下方法（取消注释并配置）
-      # - name: 设置 iOS 证书
-      #   uses: apple-actions/import-codesign-certs@v2
-      #   with:
-      #     p12-file-base64: ${{ secrets.IOS_CERTIFICATE }}
-      #     p12-password: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
-      
-      # - name: 构建并签名 IPA
-      #   run: |
-      #     flutter build ipa --export-options-plist=ExportOptions.plist
-      #     IPA_NAME="${APP_NAME}_${{ env.VERSION }}.ipa"
-      #     echo "IPA_NAME=${IPA_NAME}" >> $GITHUB_ENV
-      #     cp build/ios/ipa/*.ipa ${IPA_NAME}
-      
+      # 上传到 Release
       - uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.APP_NAME }}_${{ env.VERSION }}.ipa
+          files: ${{ env.IPA_NAME || env.APP_NAME }}_${{ env.VERSION }}.ipa
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.sha }}
           name: ${{ env.APP_NAME }} Release ${{ env.VERSION }}
           draft: ${{ startsWith(github.ref, 'refs/tags/') == false }}
