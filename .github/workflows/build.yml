@@ -1,16 +1,10 @@
 # 触发工作流的条件：手动触发（workflow_dispatch）或推送了 tag（例如 v1.0.0）
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: '版本号（例如：1.0.0）'
-        required: true
   push:
     tags:
       - '*'  # 匹配所有 tag，例如 v1.0.0
 
-env:
-  APP_NAME: 'YingShiPan'
       
 jobs:
   android: # 构建 Android 应用
@@ -21,48 +15,24 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
-      # 设置版本号变量
-      - name: 设置版本号
-        id: set_version
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-          else
-            VERSION="${GITHUB_REF#refs/tags/}"
-            # 移除版本号前的 'v' 前缀（如果有）
-            VERSION="${VERSION#v}"
-          fi
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV
-          echo "::set-output name=version::${VERSION}"
-      
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-      
       - uses: subosito/flutter-action@v2
-      
       - run: flutter pub get
       - run: flutter build apk --target-platform android-arm64
-      
-      # 重命名 APK 文件
-      - name: 重命名 APK 文件
-        run: |
-          APK_NAME="${APP_NAME}_${{ env.VERSION }}.apk"
-          echo "APK_NAME=${APK_NAME}" >> $GITHUB_ENV
-          cp build/app/outputs/flutter-apk/app-release.apk ${APK_NAME}
-      
+      - run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/YingShiPan_android.apk && cp build/app/outputs/flutter-apk/YingShiPan_android.apk YingShiPan_android.apk.apk
       - uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.APK_NAME || env.APP_NAME }}_${{ env.VERSION }}.apk
+          files: YingShiPan_android.apk.apk
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.sha }}
-          name: ${{ env.APP_NAME }} Release ${{ env.VERSION }}
+          name: Release ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.sha }}
           draft: ${{ startsWith(github.ref, 'refs/tags/') == false }}
           prerelease: false
-          overwrite: true
-          delete_old_assets: true
-          fail_on_unmatched_files: false
+          overwrite: true          # 新增：覆盖已存在的同名 Release
+          delete_old_assets: true  # 新增：删除旧的资产文件
+          fail_on_unmatched_files: false # 新增：避免文件匹配失败报错
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
@@ -74,61 +44,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
-      # 设置版本号变量（与 Android job 相同的逻辑）
-      - name: 设置版本号
-        id: set_version
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-          else
-            VERSION="${GITHUB_REF#refs/tags/}"
-            # 移除版本号前的 'v' 前缀（如果有）
-            VERSION="${VERSION#v}"
-          fi
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV
-          echo "::set-output name=version::${VERSION}"
-      
       - uses: subosito/flutter-action@v2
-      
       - run: flutter pub get
-      
-      # 构建 iOS 应用（未签名的 .app）
-      - name: 构建 iOS 应用
-        run: |
-          flutter build ios --release --no-codesign
-      
-      # 创建 .ipa 文件（未签名，用于测试）
-      - name: 创建 IPA 文件
-        run: |
-          IPA_NAME="${APP_NAME}_${{ env.VERSION }}.ipa"
-          echo "IPA_NAME=${IPA_NAME}" >> $GITHUB_ENV
-          
-          # 创建临时目录结构
-          mkdir -p Payload
-          
-          # 复制 .app 到 Payload
-          cp -r build/ios/iphoneos/Runner.app Payload/
-          
-          # 创建 IPA（zip 格式）
-          zip -r "${IPA_NAME}" Payload
-          
-          # 验证文件
-          ls -la "${IPA_NAME}"
-          
-          # 清理
-          rm -rf Payload
-      
-      # 上传到 Release
+      - run: flutter build ios --release --no-codesign
+      - run: zip -r YingShiPan_iphone.zip build/ios/iphoneos/Payload && mv YingShiPan_iphone.zip YingShiPan_iphone.ipa
       - uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.IPA_NAME || env.APP_NAME }}_${{ env.VERSION }}.ipa
+          files: YingShiPan_iphone.ipa
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.sha }}
-          name: ${{ env.APP_NAME }} Release ${{ env.VERSION }}
+          name: Release ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.sha }}
           draft: ${{ startsWith(github.ref, 'refs/tags/') == false }}
           prerelease: false
-          overwrite: true
-          delete_old_assets: true
-          fail_on_unmatched_files: false
+          overwrite: true          # 新增：覆盖已存在的同名 Release
+          delete_old_assets: true  # 新增：删除旧的资产文件
+          fail_on_unmatched_files: false # 新增：避免文件匹配失败报错
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
